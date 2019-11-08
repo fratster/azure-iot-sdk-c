@@ -546,7 +546,8 @@ static int IoTHubClient_LL_UploadToBlob_step3(IOTHUB_CLIENT_LL_UPLOADTOBLOB_HAND
     /*this POST "tries" to happen*/
 
     /*Codes_SRS_IOTHUBCLIENT_LL_02_085: [ IoTHubClient_LL_UploadMultipleBlocksToBlob(Ex) shall use the same authorization as step 1. to prepare and perform a HTTP request with the following parameters: ]*/
-    STRING_HANDLE relativePathNotification = STRING_construct_sprintf("/devices/%s/files/notifications/%s%s", upload_data->deviceId, STRING_c_str(correlationId), API_VERSION);
+    STRING_HANDLE relativePathNotification = STRING_construct_sprintf("/devices/%s/files/notifications/%s", upload_data->deviceId, API_VERSION);
+    (void)correlationId;
     if (relativePathNotification == NULL)
     {
         result = MU_FAILURE;
@@ -830,11 +831,13 @@ IOTHUB_CLIENT_RESULT IoTHubClient_LL_UploadMultipleBlocksToBlob_Impl(IOTHUB_CLIE
                                             STRING_HANDLE req_string;
                                             if(response == NULL)
                                             {
-                                                req_string = STRING_construct_sprintf("{\"isSuccess\":%s, \"statusCode\":%d, \"statusDescription\":""}", ((httpResponse < 300) ? "true" : "false"), httpResponse);
+                                                req_string = STRING_construct_sprintf("{\"correlationId\":\"%s\", \"isSuccess\":%s, \"statusCode\":%d, \"statusDescription\":""}", 
+                                                                                        STRING_c_str(correlationId), ((httpResponse < 300) ? "true" : "false"), httpResponse);
                                         	}
                                             else
                                             {
-                                                req_string = STRING_construct_sprintf("{\"isSuccess\":%s, \"statusCode\":%d, \"statusDescription\":\"%s\"}", ((httpResponse < 300) ? "true" : "false"), httpResponse, response);
+                                                req_string = STRING_construct_sprintf("{\"correlationId\":\"%s\", \"isSuccess\":%s, \"statusCode\":%d, \"statusDescription\":\"%s\"}", 
+                                                                                        STRING_c_str(correlationId), ((httpResponse < 300) ? "true" : "false"), httpResponse, response);
                                             }
                                             if (req_string == NULL)
                                             {
